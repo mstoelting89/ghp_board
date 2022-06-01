@@ -98,6 +98,8 @@ export default {
       console.log(this.newsAuthor);
       console.log(this.newsText);
       console.log(this.files);
+
+      this.$store.dispatch('getNews');
     },
     handleFile() {
       this.files = this.$refs.myFiles.files;
