@@ -2,8 +2,18 @@ import newsService from "@/service/newsService";
 
 export const actions = {
     getNews() {
-        newsService.get().then((response) => {
-            console.log(response);
+        return new Promise((resolve) => {
+            newsService.getNews().then((response) => {
+                resolve(response);
+            });
+        });
+    },
+    getNewsDetail({ commit }, payload) {
+        commit('NEWS');
+        return new Promise((resolve) => {
+           newsService.getNewsDetail(payload).then((response) => {
+               resolve(response);
+           })
         });
     }
 }

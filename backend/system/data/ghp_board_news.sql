@@ -9,4 +9,6 @@ create table news
     news_title  varchar(255) not null
 );
 
-INSERT INTO ghp_board.news (id, news_author, news_date, news_image, news_text, news_title) VALUES (1, 'Michael', '2022-06-01 21:16:20', null, 'Foo Bar', 'Dies ist der erste Titel');
+INSERT INTO ghp_board.news (id, news_author, news_date, news_image, news_text, news_title) VALUES (1, 'Michael', '2022-06-01 21:16:20', null, 'Foo Bar', 'Dies ist der dritte Titel');
+INSERT INTO ghp_board.news (id, news_author, news_date, news_image, news_text, news_title) VALUES (2, 'Michael', '2022-05-01 21:16:20', null, 'Foo Bar', 'Dies ist der zweite Titel');
+INSERT INTO ghp_board.news (id, news_author, news_date, news_image, news_text, news_title) VALUES (3, 'Michael', '2022-04-01 21:16:20', null, 'Foo Bar', 'Dies ist der erste Titel');

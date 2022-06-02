@@ -4,6 +4,16 @@
       <h2>Guitar Hearts News</h2>
       <font-awesome-icon class="add-icon" icon="circle-plus" data-bs-toggle="modal" data-bs-target="#addNews" />
     </div>
+    <div class="newsEntry" v-for="newsEntry in newsArray" v-bind:key="newsEntry">
+      <div class="newsEntryHeader">
+        <div class="newsEntryAuthor">{{ newsEntry.newsAuthor }}</div>
+        <div class="newsEntryDate">{{ newsEntry.newsDate }}</div>
+      </div>
+      <div class="newsEntryMain">
+        <div class="newsEntryTitle">{{ newsEntry.newsTitle }}</div>
+        <button class="btn btn-secondary" @click="getNewsDetail(newsEntry.id)">mehr lesen</button>
+      </div>
+    </div>
   </div>
 
   <div class="modal fade" id="addNews" tabindex="-1" aria-labelledby="addNews" aria-hidden="true">
@@ -63,7 +73,7 @@
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
-          <button type="button" class="btn btn-primary" @click="send">Speichern</button>
+          <button type="button" class="btn btn-primary">Speichern</button>
         </div>
       </div>
     </div>
@@ -78,28 +88,28 @@ export default {
   data() {
     return {
       newsEditor: ClassicEditor,
-      editorConfig: {
-
-      },
+      editorConfig: {},
       newsTitle: '',
       newsDate: '',
       newsAuthor: '',
       newsText: '',
-      files: ''
+      files: '',
+      newsArray: ''
     };
+  },
+  async created() {
+    await this.$store.dispatch('getNews').then(response => {
+      this.newsArray = response.data;
+    });
   },
   methods: {
     logout() {
       this.$store.dispatch('logout').then(() => this.$router.push('/login'));
     },
-    send() {
-      console.log(this.newsTitle);
-      console.log(this.newsDate);
-      console.log(this.newsAuthor);
-      console.log(this.newsText);
-      console.log(this.files);
+    getNewsDetail(id) {
+      this.$store.dispatch('getNewsDetail', id).then(() => {
 
-      this.$store.dispatch('getNews');
+      });
     },
     handleFile() {
       this.files = this.$refs.myFiles.files;
@@ -139,5 +149,28 @@ export default {
   border-radius: 5px;
   border: none;
   padding: 15px 40px;
+}
+.newsEntry {
+  border-bottom: 1px solid #454545;
+  padding-bottom: 5px;
+}
+.newsEntryHeader {
+  display: flex;
+  font-size: 12px;
+  opacity: .8;
+  justify-content: space-between;
+}
+
+.newsEntryMain {
+  display: flex;
+  font-size: 18px;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.newsEntryMain .btn {
+  padding: 5px;
+  font-size: 12px;
+  background-color: #a21d21;
 }
 </style>

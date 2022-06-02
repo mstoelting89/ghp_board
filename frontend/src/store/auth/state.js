@@ -1,4 +1,5 @@
 export const state = {
     loggedIn: false,
-    errorMsg: ''
+    errorMsg: '',
+    news: false
 }
