@@ -25,6 +25,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             String token = (String) authentication.getCredentials();
             String email = jwtAuthenticationService.getEmailFromToken(token);
 
+
             return jwtAuthenticationService.validateToken(token)
                     .map(aBoolean -> new JwtAuthenticationProfile(email))
                     .orElseThrow(() -> new JwtAuthenticationException("Token validation failed"));

@@ -1,22 +1,12 @@
 package com.example.system.news;
 
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
-
 import java.util.List;
 
-@Service
-@AllArgsConstructor
-public class NewsService {
+public interface NewsService {
 
-    private NewsRepository newsRepository;
+    List<News> getAllNewsEntries();
 
-    public List<News> getAllNewsEntries() {
-        return newsRepository.findAll();
-    }
+    News getNewsEntry(Long id);
 
-    public News getNewsEntry(Long id) {
-        return newsRepository.findById(id).orElseThrow(() -> new NotFoundException("Newsentry not found"));
-    }
+    News insertNewNewsEntry(NewsEntryDto newsEntryDto);
 }

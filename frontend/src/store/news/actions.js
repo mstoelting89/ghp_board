@@ -15,5 +15,14 @@ export const actions = {
                resolve(response);
            })
         });
+    },
+    insertNewNewsEntry({ commit }, payload) {
+        commit("NEWS");
+
+        return new Promise((resolve) => {
+            newsService.insertNewsEntry(payload).then((response) => {
+                resolve(response);
+            });
+        })
     }
 }

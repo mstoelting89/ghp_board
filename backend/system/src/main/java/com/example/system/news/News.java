@@ -33,4 +33,13 @@ public class News {
     private String newsAuthor;
 
     private String newsImage;
+
+    public News (LocalDateTime newsDate, String newsTitle, String newsText, String newsAuthor, String newsImage) {
+        this.newsDate = newsDate;
+        this.newsTitle = newsTitle;
+        this.newsText = newsText;
+        this.newsAuthor = newsAuthor;
+        this.newsImage = newsImage;
+
+    }
 }
