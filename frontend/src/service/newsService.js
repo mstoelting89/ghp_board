@@ -30,10 +30,10 @@ export default {
         });
     },
     insertNewsEntry(data) {
-        console.log(data);
         const token = localStorage.getItem('token');
         const header = {
-            'Content-Type' : 'application/json',
+            //'Content-Type' : 'application/json',
+            'Content-Type' : 'multipart/form-data',
             'Authorization': `Bearer ${token}`,
             'Access-Control-Allow-Origin' : '*',
             'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
@@ -43,5 +43,19 @@ export default {
             headers: header
         });
 
+    },
+    getAttachment(id) {
+        const token = localStorage.getItem('token');
+        const header = {
+            //'Content-Type' : 'application/json',
+            'Content-Type' : 'multipart/form-data',
+            'Authorization': `Bearer ${token}`,
+            'Access-Control-Allow-Origin' : '*',
+            'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+        }
+
+        return axios.get("http://localhost:8886/api/v1/attachment/" + id, {
+            headers: header
+        });
     }
 }

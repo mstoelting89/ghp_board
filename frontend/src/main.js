@@ -6,6 +6,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 /* import specific icons */
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons'
+import { faPen } from '@fortawesome/free-solid-svg-icons'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -13,6 +15,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 /* add icons to the library */
 library.add(faPlus)
 library.add(faCirclePlus)
+library.add(faPen)
+library.add(faTrash)
 
 import CKEditor from '@ckeditor/ckeditor5-vue';
 

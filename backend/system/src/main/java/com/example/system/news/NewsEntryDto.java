@@ -13,7 +13,7 @@ public class NewsEntryDto {
     private Long id;
     private String newsTitle;
     private String newsText;
-    private String newsDate;
+    private LocalDateTime newsDate;
     private String newsAuthor;
     private String newsImage;
 }

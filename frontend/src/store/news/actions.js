@@ -24,5 +24,14 @@ export const actions = {
                 resolve(response);
             });
         })
+    },
+    getAttachment({ commit }, payload) {
+        commit("NEWS");
+
+        return new Promise((resolve) => {
+            newsService.getAttachment(payload).then((response) => {
+                resolve(response);
+            })
+        })
     }
 }

@@ -33,6 +33,8 @@ services:
       - db
     ports:
       - "8886:8080"
+    volumes:
+      - ./backend/system/src/main/resources/upload:/upload
 
   mailhog:
     image: mailhog/mailhog:latest

@@ -11,7 +11,17 @@
       </div>
       <div class="newsEntryMain">
         <div class="newsEntryTitle">{{ newsEntry.newsTitle }}</div>
-        <button class="btn btn-secondary" @click="getNewsDetail(newsEntry.id)" data-bs-toggle="modal" data-bs-target="#showNews">mehr lesen</button>
+        <div class="buttons">
+          <div class="show-news">
+            <button class="btn btn-secondary" @click="getNewsDetail(newsEntry.id)" data-bs-toggle="modal" data-bs-target="#showNews">mehr lesen</button>
+          </div>
+          <div class="update-news">
+            <font-awesome-icon class="update-icon" icon="pen" data-bs-toggle="modal" data-bs-target="#addNews" />
+          </div>
+          <div class="delete-news">
+            <font-awesome-icon class="delete-icon" icon="trash" data-bs-toggle="modal" data-bs-target="#addNews" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -69,7 +79,7 @@
                 <label for="newsImage" class="col-form-label">Bild</label>
               </div>
               <div class="col-5">
-                <input type="file" class="form-control" ref="myFiles" id="newsImage" @change="handleFile()">
+                <input type="file" class="form-control" ref="newsImage" id="newsImage" @change="handleFile()">
               </div>
             </div>
 
@@ -103,7 +113,12 @@
             </div>
           </div>
         </div>
-        <div class="modal-body" v-html="detailText"></div>
+        <div class="modal-body">
+          <div class="body-image">
+            <img class="detailImage" src="" id="detailImage">
+          </div>
+          <div class="body-text" v-html="detailText"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -111,28 +126,41 @@
 
 <script>
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+//import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
+//import ClassicEditor from 'ckeditor5-custom-build/build/ckeditor';
 
 export default {
   name: "News",
   data() {
     return {
       newsEditor: ClassicEditor,
-      editorConfig: {},
+      editorConfig: {
+      },
       newsTitle: '',
       newsDate: '',
       newsAuthor: '',
       newsText: '',
-      files: '',
+      formData: null,
+      file: null,
       newsArray: '',
       detailTitle: '',
       detailText: '',
       detailAuthor: '',
-      detailDate: ''
+      detailDate: '',
+      detailImage:''
     };
   },
   async created() {
     await this.$store.dispatch('getNews').then(response => {
+      this.newsArray = this.loadNews(response);
+    });
 
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch('logout').then(() => this.$router.push('/login'));
+    },
+    loadNews(response) {
       let data = [];
       response.data.forEach((item) => {
         let date = new Date(item.newsDate);
@@ -147,27 +175,28 @@ export default {
         }
         data.push(newsElement);
       });
-      this.newsArray = data;
-    });
-
-  },
-  methods: {
-    logout() {
-      this.$store.dispatch('logout').then(() => this.$router.push('/login'));
+      return data;
     },
     getNewsDetail(id) {
       this.$store.dispatch('getNewsDetail', id).then(response => {
         let date = new Date(response.data.newsDate);
         let newsDate = ("0" + date.getDate()).slice(-2) + "." + ("0" + (date.getMonth() + 1)).slice(-2) + "." + date.getFullYear();
+        let image = document.querySelector('#detailImage');
 
         this.detailTitle = response.data.newsTitle;
         this.detailAuthor = response.data.newsAuthor;
         this.detailText = response.data.newsText;
         this.detailDate = newsDate;
+
+        if (response.data.newsImage) {
+          image.setAttribute('src', "data:image/jpg;base64," + response.data.newsImage);
+        } else {
+          image.setAttribute('src', '');
+        }
       });
     },
     handleFile() {
-      this.files = this.$refs.myFiles.files;
+      this.file = this.$refs.newsImage.files[0];
     },
     insertNewNewsEntry() {
 
@@ -182,16 +211,20 @@ export default {
           checkAuthor ||
           checkText
       ) {
+        this.formData = new FormData();
+        this.formData.append('file', this.file);
+
         let data = {
           newsTitle: this.newsTitle,
           newsDate: this.newsDate + "T00:00:00",
           newsAuthor: this.newsAuthor,
-          newsText: this.newsText
+          newsText: this.newsText,
         }
+        this.formData.append('newsData', JSON.stringify(data));
 
-        this.$store.dispatch('insertNewNewsEntry', data).then(() => {
+        this.$store.dispatch('insertNewNewsEntry', this.formData).then(() => {
           this.$store.dispatch('getNews').then(response => {
-            this.newsArray = response.data;
+            this.newsArray = this.loadNews(response);
           });
         });
         document.querySelector('#showNews .btn-close').click();
@@ -318,6 +351,26 @@ export default {
   display: flex;
   font-size: 12px;
   font-weight: bold;
-  color: #a21d21;;
+  color: #a21d21;
+}
+.detailImage {
+  width:50%;
+  height:auto;
+}
+.body-text {
+  text-align: left;
+}
+.newsEntryMain .buttons {
+  display: flex;
+}
+.newsEntryMain .buttons .update-icon, .newsEntryMain .buttons .delete-icon {
+  background-color: #a21d21;
+  color: #fff;
+  padding:7px;
+  font-size:28px;
+  border-radius: 5px;
+  margin-left: 5px;
+  margin-top: 1px;
+  cursor: pointer;
 }
 </style>

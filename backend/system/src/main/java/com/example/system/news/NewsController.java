@@ -1,15 +1,22 @@
 package com.example.system.news;
 
 import com.example.system.security.jwt.JwtAuthenticationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.webjars.NotFoundException;
 
+import javax.lang.model.element.NestingKind;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -26,14 +33,23 @@ public class NewsController {
 
     @GetMapping(path = "/api/v1/news/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getNews(@PathVariable("id") Long id, HttpServletRequest request) {
+
         return new ResponseEntity<>(newsService.getNewsEntry(id), HttpStatus.OK);
     }
 
     // Post -> receive a new NewsEntry
-    @PostMapping(path = "/api/v1/news", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createNews(@RequestBody NewsEntryDto newsEntryDto, HttpServletRequest request) {
+    @PostMapping(
+            path = "/api/v1/news",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> createNews(@RequestParam("file") Optional<MultipartFile> file, @RequestParam("newsData") String newsEntryString, HttpServletRequest request) throws IOException {
 
-        return new ResponseEntity<>(newsService.insertNewNewsEntry(newsEntryDto), HttpStatus.OK);
+        ObjectMapper mapper = new ObjectMapper()
+                .findAndRegisterModules()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        NewsEntryDto newsEntryDto = mapper.readValue(newsEntryString, NewsEntryDto.class);
+
+        return new ResponseEntity<>(newsService.insertNewNewsEntry(newsEntryDto, file), HttpStatus.OK);
     }
 
     //Put -> update an existing NewsEntry
