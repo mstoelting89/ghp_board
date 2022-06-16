@@ -11,7 +11,7 @@ export default {
             'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
         }
 
-        return axios.get("http://localhost:8886/api/v1/news", {
+        return axios.get(process.env.VUE_APP_BACKEND_URL + "/api/v1/news", {
             headers: header
         });
     },
@@ -25,7 +25,7 @@ export default {
             'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
         }
 
-        return axios.get("http://localhost:8886/api/v1/news/" + id, {
+        return axios.get(process.env.VUE_APP_BACKEND_URL + "/api/v1/news/" + id, {
             headers: header
         });
     },
@@ -39,7 +39,7 @@ export default {
             'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
         }
 
-        return axios.post("http://localhost:8886/api/v1/news", data, {
+        return axios.post(process.env.VUE_APP_BACKEND_URL + "/api/v1/news", data, {
             headers: header
         });
 
@@ -54,7 +54,7 @@ export default {
             'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
         }
 
-        return axios.get("http://localhost:8886/api/v1/attachment/" + id, {
+        return axios.get(process.env.VUE_APP_BACKEND_URL + "/api/v1/attachment/" + id, {
             headers: header
         });
     }
