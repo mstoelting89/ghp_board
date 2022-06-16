@@ -16,7 +16,7 @@
             <button class="btn btn-secondary" @click="getNewsDetail(newsEntry.id)" data-bs-toggle="modal" data-bs-target="#showNews">mehr lesen</button>
           </div>
           <div class="update-news">
-            <font-awesome-icon class="update-icon" icon="pen" data-bs-toggle="modal" data-bs-target="#addNews" />
+            <font-awesome-icon class="update-icon" @click="setUpdateNewsId(newsEntry.id)"  icon="pen" data-bs-toggle="modal" data-bs-target="#updateNews" />
           </div>
           <div class="delete-news">
             <font-awesome-icon class="delete-icon" icon="trash" data-bs-toggle="modal" data-bs-target="#addNews" />
@@ -26,129 +26,38 @@
     </div>
   </div>
 
-  <div class="modal fade" id="addNews" tabindex="-1" aria-labelledby="addNews" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addNewsLabel">Neuer Newseintrag</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form>
+  <NewsAddModal />
+  <NewsUpdateModal
+      :newsUpdateId="newsUpdateId"
+      :newsUpdateDetail="newsDetail"
+  />
+  <NewsShowModal
+      :newsDetail="newsDetail"
+  />
 
-            <div class="mb-3 d-flex">
-              <div class="col-1 d-flex justify-content-start">
-                <label for="newsTitle" class="col-form-label">Titel</label>
-              </div>
-              <div class="col-5" ref="newsTitle">
-                <input type="text" class="form-control"  id="newsTitle" @keydown="removeErrorMessage" v-model="newsTitle">
-                <div class="errorMsg"></div>
-              </div>
-              <div class="col-1"></div>
-              <div class="col-1 d-flex justify-content-start">
-                <label for="newsTitle" class="col-form-label">Datum</label>
-              </div>
-              <div class="col-4" ref="newsDate">
-                <input type="date" class="form-control" id="newsDate" @keydown="removeErrorMessage" v-model="newsDate">
-                <div class="errorMsg"></div>
-              </div>
-            </div>
-
-            <div class="mb-3 d-flex">
-              <div class="col-1 d-flex justify-content-start">
-                <label for="newsTitle" class="col-form-label">Autor</label>
-              </div>
-              <div class="col-5" ref="newsAuthor">
-                <input type="text" class="form-control" id="newsAuthor" @keydown="removeErrorMessage" v-model="newsAuthor">
-                <div class="errorMsg"></div>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <div class="col-1 d-flex justify-content-start">
-                <label class="col-form-label">Text:</label>
-              </div>
-              <div class="col-12 justify-content-start" ref="newsText">
-                <ckeditor :editor="newsEditor" :config="editorConfig" v-model="newsText" class="form-control"></ckeditor>
-                <div class="errorMsg"></div>
-              </div>
-            </div>
-
-            <div class="mb-3 d-flex">
-              <div class="col-1 d-flex justify-content-start">
-                <label for="newsImage" class="col-form-label">Bild</label>
-              </div>
-              <div class="col-5">
-                <input type="file" class="form-control" ref="newsImage" id="newsImage" @change="handleFile()">
-              </div>
-            </div>
-
-          </form>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-bs-dismiss="modal">Schließen</button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="insertNewNewsEntry">Speichern</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="showNews" tabindex="-1" aria-labelledby="showNews" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="row">
-            <div class="newsDetailInfo">
-              <div class="newsDetailAuthor" v-html="detailAuthor"></div>
-              <div class="newsDetailInfoEnd">
-                <div class="newsDetailDate" v-html="detailDate"></div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-            </div>
-
-          </div>
-          <div class="row">
-            <div class="newsDetailHeader">
-              <div class="newsDetailTitle" v-html="detailTitle"></div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-body">
-          <div class="body-image">
-            <img class="detailImage" src="" id="detailImage">
-          </div>
-          <div class="body-text" v-html="detailText"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-//import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
-//import ClassicEditor from 'ckeditor5-custom-build/build/ckeditor';
+import NewsAddModal from "@/components/members/container/NewsAddModal";
+import NewsShowModal from "@/components/members/container/NewsShowModal";
+import NewsUpdateModal from "@/components/members/container/NewsUpdateModal";
 
 export default {
   name: "News",
+  components: {NewsUpdateModal, NewsShowModal, NewsAddModal},
   data() {
     return {
-      newsEditor: ClassicEditor,
-      editorConfig: {
-      },
-      newsTitle: '',
-      newsDate: '',
-      newsAuthor: '',
-      newsText: '',
-      formData: null,
-      file: null,
       newsArray: '',
-      detailTitle: '',
-      detailText: '',
-      detailAuthor: '',
-      detailDate: '',
-      detailImage:''
-    };
+      newsUpdate: false,
+      newsUpdateId: '',
+      newsDetail: {
+        detailAuthor: '',
+        detailDate: '',
+        detailTitle: '',
+        detailText: '',
+        detailImage: null
+      }
+    }
   },
   async created() {
     await this.$store.dispatch('getNews').then(response => {
@@ -175,6 +84,7 @@ export default {
         }
         data.push(newsElement);
       });
+      this.newsArray = data;
       return data;
     },
     getNewsDetail(id) {
@@ -183,10 +93,11 @@ export default {
         let newsDate = ("0" + date.getDate()).slice(-2) + "." + ("0" + (date.getMonth() + 1)).slice(-2) + "." + date.getFullYear();
         let image = document.querySelector('#detailImage');
 
-        this.detailTitle = response.data.newsTitle;
-        this.detailAuthor = response.data.newsAuthor;
-        this.detailText = response.data.newsText;
-        this.detailDate = newsDate;
+        this.newsDetail.detailTitle = response.data.newsTitle;
+        this.newsDetail.detailAuthor = response.data.newsAuthor;
+        this.newsDetail.detailText = response.data.newsText;
+        this.newsDetail.detailDate = newsDate;
+        this.newsDetail.detailImage = "data:image/jpg;base64," + response.data.newsImage;
 
         if (response.data.newsImage) {
           image.setAttribute('src', "data:image/jpg;base64," + response.data.newsImage);
@@ -195,54 +106,8 @@ export default {
         }
       });
     },
-    handleFile() {
-      this.file = this.$refs.newsImage.files[0];
-    },
-    insertNewNewsEntry() {
-
-      let checkTitle = this.checkField(this.newsTitle, this.$refs.newsTitle);
-      let checkDate = this.checkField(this.newsDate, this.$refs.newsDate);
-      let checkAuthor = this.checkField(this.newsAuthor, this.$refs.newsAuthor);
-      let checkText = this.checkField(this.newsText, this.$refs.newsText);
-
-      if (
-          checkTitle ||
-          checkDate ||
-          checkAuthor ||
-          checkText
-      ) {
-        this.formData = new FormData();
-        this.formData.append('file', this.file);
-
-        let data = {
-          newsTitle: this.newsTitle,
-          newsDate: this.newsDate + "T00:00:00",
-          newsAuthor: this.newsAuthor,
-          newsText: this.newsText,
-        }
-        this.formData.append('newsData', JSON.stringify(data));
-
-        this.$store.dispatch('insertNewNewsEntry', this.formData).then(() => {
-          this.$store.dispatch('getNews').then(response => {
-            this.newsArray = this.loadNews(response);
-          });
-        });
-        document.querySelector('#showNews .btn-close').click();
-      }
-    },
-    checkField(input, inputWrapper) {
-      if (input.length <= 0) {
-        inputWrapper.querySelector('.errorMsg').innerHTML = "Dieses Feld muss ausgefüllt sein";
-        return false;
-      } else {
-        inputWrapper.querySelector('.errorMsg').innerHTML = "";
-        return true;
-      }
-    },
-    removeErrorMessage(event) {
-      if (event.target.parentNode.querySelector('.errorMsg').innerHTML.length > 0) {
-        event.target.parentNode.querySelector('.errorMsg').innerHTML = "";
-      }
+    setUpdateNewsId(id) {
+      this.newsUpdateId = id;
     }
   }
 }
@@ -265,22 +130,6 @@ export default {
   color: #a21d21;
   cursor: pointer;
 }
-.modal-dialog {
-  min-width: 70vw;
-}
-.modal-content {
-  min-height: 90vh;
-}
-.btn-close {
-  background-color: transparent;
-  border: none;
-}
-.btn {
-  font-weight: bold;
-  border-radius: 5px;
-  border: none;
-  padding: 15px 40px;
-}
 .newsEntry {
   border-bottom: 1px solid #454545;
   padding-bottom: 5px;
@@ -298,70 +147,13 @@ export default {
   justify-content: space-between;
   margin-top: 5px;
 }
-
+.newsEntryMain .buttons {
+  display: flex;
+}
 .newsEntryMain .btn {
   padding: 5px;
   font-size: 12px;
   background-color: #a21d21;
-}
-
-.btn-secondary {
-  padding: 5px;
-  font-size: 12px;
-  background-color: #a21d21;
-}
-
-.btn-default {
-  border: 1px solid #a21d21;
-}
-
-.btn-primary {
-  padding: 15px 40px;
-  font-size: 16px;
-  background-color: #a21d21;
-}
-
-#showNews .modal-header {
-  flex-direction: column;
-}
-
-#showNews .modal-header .row {
-  width: 100%;
-}
-
-.newsDetailInfo {
-  display: flex;
-  font-size: 12px;
-  opacity: .8;
-  justify-content: space-between;
-}
-.newsDetailHeader {
-  display: flex;
-  font-size: 18px;
-  justify-content: space-between;
-  margin-top: 5px;
-}
-.newsDetailInfoEnd {
-  display: flex;
-}
-.newsDetailInfoEnd .btn-close {
-  padding-top: 14px;
-}
-.errorMsg {
-  display: flex;
-  font-size: 12px;
-  font-weight: bold;
-  color: #a21d21;
-}
-.detailImage {
-  width:50%;
-  height:auto;
-}
-.body-text {
-  text-align: left;
-}
-.newsEntryMain .buttons {
-  display: flex;
 }
 .newsEntryMain .buttons .update-icon, .newsEntryMain .buttons .delete-icon {
   background-color: #a21d21;
