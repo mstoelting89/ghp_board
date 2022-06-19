@@ -55,8 +55,33 @@ public class NewsController {
     }
 
     //Put -> update an existing NewsEntry
+    @PutMapping(
+            path = "/api/v1/news",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> updateNews(
+            @RequestParam("file") Optional<MultipartFile> file,
+            @RequestParam("newsUpdateId") Long newsUpdateId,
+            @RequestParam("newsData") String newsUpdateString,
+            HttpServletRequest request) throws IOException
+    {
+        ObjectMapper mapper = new ObjectMapper()
+                .findAndRegisterModules()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        NewsEntryDto newsUpdateDto = mapper.readValue(newsUpdateString, NewsEntryDto.class);
+
+        return new ResponseEntity<>(newsService.updateNewsEntry(newsUpdateId, newsUpdateDto, file), HttpStatus.OK);
+    }
 
     //Delete -> delete an existing NewsEntry
+    @DeleteMapping(
+            path = "/api/v1/news/{id}"
+    )
+    public ResponseEntity<?> deleteNews(@PathVariable("id") Long newsDeleteId) {
+        newsService.deleteNewsEntry(newsDeleteId);
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> handlerNotFoundException(NotFoundException ex) {

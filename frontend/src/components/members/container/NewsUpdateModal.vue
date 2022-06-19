@@ -131,9 +131,8 @@ export default {
       ) {
         this.formData = new FormData();
         this.formData.append('file', this.file);
-
+        this.formData.append('newsUpdateId', this.newsUpdateId);
         let data = {
-          newsId: this.newsUpdateId,
           newsTitle: this.title,
           newsDate: this.date + "T00:00:00",
           newsAuthor: this.author,
@@ -141,16 +140,12 @@ export default {
         }
         this.formData.append('newsData', JSON.stringify(data));
 
-        //TODO: send update call
-        /*
-        this.$store.dispatch('insertNewNewsEntry', this.formData).then(() => {
+        this.$store.dispatch('updateNewsEntry', this.formData).then(() => {
           this.$store.dispatch('getNews').then(response => {
-            this.newsArray = this.loadNews(response);
+            this.$parent.loadNews(response);
           });
         });
         document.querySelector('#showNews .btn-close').click();
-
-         */
       }
     }
   }

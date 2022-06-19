@@ -25,6 +25,24 @@ export const actions = {
             });
         })
     },
+    updateNewsEntry({ commit }, payload) {
+        commit("NEWS");
+
+        return new Promise((resolve) => {
+            newsService.updateNewsEntry(payload).then((response) => {
+                resolve(response);
+            })
+        })
+    },
+    deleteNewsEntry({ commit }, payload) {
+        commit("NEWS");
+
+        return new Promise((resolve) => {
+            newsService.deleteNewsEntry(payload).then((response) => {
+                resolve(response);
+            })
+        })
+    },
     getAttachment({ commit }, payload) {
         commit("NEWS");
 

@@ -42,7 +42,6 @@ public class NewsServiceImpl implements NewsService{
 
         var attachment = attachmentServiceImpl.handelAttachmentUpload(file);
 
-        System.out.println(attachment);
         if(
                 newsEntryDto.getNewsAuthor() == null ||
                 newsEntryDto.getNewsTitle() == null ||
@@ -58,6 +57,39 @@ public class NewsServiceImpl implements NewsService{
                 newsEntryDto.getNewsAuthor(),
                 attachment
         ));
+
+    }
+
+    @Override
+    public News updateNewsEntry(Long newsId, NewsEntryDto newsUpdateDto, Optional<MultipartFile> file) throws IOException {
+        var newsEntry = newsRepository.findById(newsId)
+                .orElseThrow(() -> new NotFoundException("Kein Eintrag mit der Id " + newsId + " gefunden"));
+
+        var attachment = attachmentServiceImpl.handelAttachmentUpload(file);
+
+        if(
+                newsUpdateDto.getNewsAuthor() == null ||
+                newsUpdateDto.getNewsTitle() == null ||
+                newsUpdateDto.getNewsText() == null
+        ) {
+            throw new NotFoundException("Speichern fehlgeschlagen - Eintrag nicht vollständig");
+        }
+
+        newsEntry.setNewsTitle(newsUpdateDto.getNewsTitle());
+        newsEntry.setNewsDate(newsUpdateDto.getNewsDate());
+        newsEntry.setNewsAuthor(newsUpdateDto.getNewsAuthor());
+        newsEntry.setNewsText(newsUpdateDto.getNewsText());
+        newsEntry.setNewsImage(attachment);
+
+        return newsRepository.save(newsEntry);
+    }
+
+    @Override
+    public void deleteNewsEntry(Long newsId) {
+        var newsEntry = newsRepository.findById(newsId)
+                .orElseThrow(() -> new NotFoundException("Löschen fehlgeschlagen - Eintrag mit der ID " + newsId + " nicht gefunden"));
+
+        newsRepository.delete(newsEntry);
 
     }
 }

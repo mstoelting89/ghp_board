@@ -19,7 +19,7 @@
             <font-awesome-icon class="update-icon" @click="setUpdateNewsId(newsEntry.id)"  icon="pen" data-bs-toggle="modal" data-bs-target="#updateNews" />
           </div>
           <div class="delete-news">
-            <font-awesome-icon class="delete-icon" icon="trash" data-bs-toggle="modal" data-bs-target="#addNews" />
+            <font-awesome-icon class="delete-icon" @click="setDeleteNewsId(newsEntry.id)" icon="trash" data-bs-toggle="modal" data-bs-target="#deleteNews" />
           </div>
         </div>
       </div>
@@ -29,10 +29,12 @@
   <NewsAddModal />
   <NewsUpdateModal
       :newsUpdateId="newsUpdateId"
-      :newsUpdateDetail="newsDetail"
   />
   <NewsShowModal
       :newsDetail="newsDetail"
+  />
+  <NewsDeleteModal
+      :newsDeleteId="newsDeleteId"
   />
 
 </template>
@@ -41,15 +43,17 @@
 import NewsAddModal from "@/components/members/container/NewsAddModal";
 import NewsShowModal from "@/components/members/container/NewsShowModal";
 import NewsUpdateModal from "@/components/members/container/NewsUpdateModal";
+import NewsDeleteModal from "@/components/members/container/NewsDeleteModal";
 
 export default {
   name: "News",
-  components: {NewsUpdateModal, NewsShowModal, NewsAddModal},
+  components: {NewsDeleteModal, NewsUpdateModal, NewsShowModal, NewsAddModal},
   data() {
     return {
       newsArray: '',
       newsUpdate: false,
       newsUpdateId: '',
+      newsDeleteId: '',
       newsDetail: {
         detailAuthor: '',
         detailDate: '',
@@ -108,6 +112,9 @@ export default {
     },
     setUpdateNewsId(id) {
       this.newsUpdateId = id;
+    },
+    setDeleteNewsId(id) {
+      this.newsDeleteId = id;
     }
   }
 }
