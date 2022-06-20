@@ -1,0 +1,8 @@
+docker-compose.yml:
+    - mariadb image to: jsurf/rpi-mariadb
+Dockerfile Backend:
+    - image: eclipse-temurin:11
+
+Currently working:
+    - api urls to: 192.168.178.69:8886
+- evtl option to create subdomain for this
