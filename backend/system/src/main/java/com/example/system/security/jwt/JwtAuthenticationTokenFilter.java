@@ -1,6 +1,8 @@
 package com.example.system.security.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,15 +19,18 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Value("${jwt.header}")
     private String tokenHeader;
 
+    private JwtAuthenticationService jwtAuthenticationService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String requestHeader = request.getHeader(this.tokenHeader);
 
         if (requestHeader != null && requestHeader.startsWith("Bearer ")) {
             String authToken = requestHeader.substring(7);
-            System.out.println(authToken);
+
             JwtAuthentication authentication = new JwtAuthentication(authToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
         }
         filterChain.doFilter(request, response);
     }

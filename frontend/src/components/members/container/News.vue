@@ -4,103 +4,117 @@
       <h2>Guitar Hearts News</h2>
       <font-awesome-icon class="add-icon" icon="circle-plus" data-bs-toggle="modal" data-bs-target="#addNews" />
     </div>
-  </div>
-
-  <div class="modal fade" id="addNews" tabindex="-1" aria-labelledby="addNews" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addNewsLabel">Neuer Newseintrag</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form>
-
-            <div class="mb-3 d-flex">
-              <div class="col-1 d-flex justify-content-start">
-                <label for="newsTitle" class="col-form-label">Titel</label>
-              </div>
-              <div class="col-5">
-                <input type="text" class="form-control" id="newsTitle" v-model="newsTitle">
-              </div>
-              <div class="col-1"></div>
-              <div class="col-1 d-flex justify-content-start">
-                <label for="newsTitle" class="col-form-label">Datum</label>
-              </div>
-              <div class="col-4">
-                <input type="date" class="form-control" id="newsDate" v-model="newsDate">
-              </div>
-            </div>
-
-            <div class="mb-3 d-flex">
-              <div class="col-1 d-flex justify-content-start">
-                <label for="newsTitle" class="col-form-label">Autor</label>
-              </div>
-              <div class="col-5">
-                <input type="text" class="form-control" id="newsAuthor" v-model="newsAuthor">
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <div class="col-1 d-flex justify-content-start">
-                <label class="col-form-label">Text:</label>
-              </div>
-              <div class="col-12 justify-content-start">
-                <ckeditor :editor="newsEditor" :config="editorConfig" v-model="newsText"></ckeditor>
-              </div>
-            </div>
-
-            <div class="mb-3 d-flex">
-              <div class="col-1 d-flex justify-content-start">
-                <label for="newsImage" class="col-form-label">Bild</label>
-              </div>
-              <div class="col-5">
-                <input type="file" class="form-control" ref="myFiles" id="newsImage" @change="handleFile()">
-              </div>
-            </div>
-
-          </form>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
-          <button type="button" class="btn btn-primary" @click="send">Speichern</button>
+    <div class="newsEntry" v-for="newsEntry in newsArray" v-bind:key="newsEntry">
+      <div class="newsEntryHeader">
+        <div class="newsEntryAuthor">{{ newsEntry.newsAuthor }}</div>
+        <div class="newsEntryDate">{{ newsEntry.newsDate }}</div>
+      </div>
+      <div class="newsEntryMain">
+        <div class="newsEntryTitle">{{ newsEntry.newsTitle }}</div>
+        <div class="buttons">
+          <div class="show-news">
+            <button class="btn btn-secondary" @click="getNewsDetail(newsEntry.id)" data-bs-toggle="modal" data-bs-target="#showNews">mehr lesen</button>
+          </div>
+          <div class="update-news">
+            <font-awesome-icon class="update-icon" @click="setUpdateNewsId(newsEntry.id)"  icon="pen" data-bs-toggle="modal" data-bs-target="#updateNews" />
+          </div>
+          <div class="delete-news">
+            <font-awesome-icon class="delete-icon" @click="setDeleteNewsId(newsEntry.id)" icon="trash" data-bs-toggle="modal" data-bs-target="#deleteNews" />
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <NewsAddModal />
+  <NewsUpdateModal
+      :newsUpdateId="newsUpdateId"
+  />
+  <NewsShowModal
+      :newsDetail="newsDetail"
+  />
+  <NewsDeleteModal
+      :newsDeleteId="newsDeleteId"
+  />
+
 </template>
 
 <script>
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import NewsAddModal from "@/components/members/container/NewsAddModal";
+import NewsShowModal from "@/components/members/container/NewsShowModal";
+import NewsUpdateModal from "@/components/members/container/NewsUpdateModal";
+import NewsDeleteModal from "@/components/members/container/NewsDeleteModal";
 
 export default {
   name: "News",
+  components: {NewsDeleteModal, NewsUpdateModal, NewsShowModal, NewsAddModal},
   data() {
     return {
-      newsEditor: ClassicEditor,
-      editorConfig: {
+      newsArray: '',
+      newsUpdate: false,
+      newsUpdateId: '',
+      newsDeleteId: '',
+      newsDetail: {
+        detailAuthor: '',
+        detailDate: '',
+        detailTitle: '',
+        detailText: '',
+        detailImage: null
+      }
+    }
+  },
+  async created() {
+    await this.$store.dispatch('getNews').then(response => {
+      this.newsArray = this.loadNews(response);
+    });
 
-      },
-      newsTitle: '',
-      newsDate: '',
-      newsAuthor: '',
-      newsText: '',
-      files: ''
-    };
   },
   methods: {
     logout() {
       this.$store.dispatch('logout').then(() => this.$router.push('/login'));
     },
-    send() {
-      console.log(this.newsTitle);
-      console.log(this.newsDate);
-      console.log(this.newsAuthor);
-      console.log(this.newsText);
-      console.log(this.files);
+    loadNews(response) {
+      let data = [];
+      response.data.forEach((item) => {
+        let date = new Date(item.newsDate);
+        let newsDate = ("0" + date.getDate()).slice(-2) + "." + ("0" + (date.getMonth() + 1)).slice(-2) + "." + date.getFullYear();
+        let newsElement = {
+          id: item.id,
+          newsAuthor: item.newsAuthor,
+          newsDate: newsDate,
+          newsImage: item.newsImage,
+          newsTitle: item.newsTitle,
+          newsText: item.newsText
+        }
+        data.push(newsElement);
+      });
+      this.newsArray = data;
+      return data;
     },
-    handleFile() {
-      this.files = this.$refs.myFiles.files;
+    getNewsDetail(id) {
+      this.$store.dispatch('getNewsDetail', id).then(response => {
+        let date = new Date(response.data.newsDate);
+        let newsDate = ("0" + date.getDate()).slice(-2) + "." + ("0" + (date.getMonth() + 1)).slice(-2) + "." + date.getFullYear();
+        let image = document.querySelector('#detailImage');
+
+        this.newsDetail.detailTitle = response.data.newsTitle;
+        this.newsDetail.detailAuthor = response.data.newsAuthor;
+        this.newsDetail.detailText = response.data.newsText;
+        this.newsDetail.detailDate = newsDate;
+        this.newsDetail.detailImage = "data:image/jpg;base64," + response.data.newsImage;
+
+        if (response.data.newsImage) {
+          image.setAttribute('src', "data:image/jpg;base64," + response.data.newsImage);
+        } else {
+          image.setAttribute('src', '');
+        }
+      });
+    },
+    setUpdateNewsId(id) {
+      this.newsUpdateId = id;
+    },
+    setDeleteNewsId(id) {
+      this.newsDeleteId = id;
     }
   }
 }
@@ -111,6 +125,7 @@ export default {
   background-color: #fff;
   height: 50vh;
   border-radius: 5px;
+  overflow: scroll;
 }
 .page-header {
   margin-top: 10px;
@@ -122,20 +137,39 @@ export default {
   color: #a21d21;
   cursor: pointer;
 }
-.modal-dialog {
-  min-width: 70vw;
+.newsEntry {
+  border-bottom: 1px solid #454545;
+  padding-bottom: 5px;
 }
-.modal-content {
-  min-height: 90vh;
+.newsEntryHeader {
+  display: flex;
+  font-size: 12px;
+  opacity: .8;
+  justify-content: space-between;
 }
-.btn-close {
-  background-color: transparent;
-  border: none;
+
+.newsEntryMain {
+  display: flex;
+  font-size: 18px;
+  justify-content: space-between;
+  margin-top: 5px;
 }
-.btn {
-  font-weight: bold;
+.newsEntryMain .buttons {
+  display: flex;
+}
+.newsEntryMain .btn {
+  padding: 5px;
+  font-size: 12px;
+  background-color: #a21d21;
+}
+.newsEntryMain .buttons .update-icon, .newsEntryMain .buttons .delete-icon {
+  background-color: #a21d21;
+  color: #fff;
+  padding:7px;
+  font-size:28px;
   border-radius: 5px;
-  border: none;
-  padding: 15px 40px;
+  margin-left: 5px;
+  margin-top: 1px;
+  cursor: pointer;
 }
 </style>

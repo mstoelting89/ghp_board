@@ -59,4 +59,14 @@ public class JwtAuthenticationService {
             return null;
         }
     }
+
+    public Boolean verifyToken(HttpServletRequest request) {
+        final String token = this.extractTokenFromRequest(request);
+
+        if (token == null) {
+            return false;
+        } else {
+            return validateToken(token).orElse(false);
+        }
+    }
 }

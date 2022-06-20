@@ -4,5 +4,8 @@ export const mutations = {
     },
     ERROR_MSG(state, payload) {
         state.errorMsg = payload;
+    },
+    NEWS(state) {
+        state.news = true
     }
 }

@@ -1,5 +1,6 @@
 package com.example.system.news;
 
+import com.example.system.attachment.Attachment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,5 +33,15 @@ public class News {
     @Column(nullable = false)
     private String newsAuthor;
 
-    private String newsImage;
+    @OneToOne
+    private Attachment newsImage;
+
+    public News (LocalDateTime newsDate, String newsTitle, String newsText, String newsAuthor, Attachment newsImage) {
+        this.newsDate = newsDate;
+        this.newsTitle = newsTitle;
+        this.newsText = newsText;
+        this.newsAuthor = newsAuthor;
+        this.newsImage = newsImage;
+
+    }
 }
