@@ -3,6 +3,10 @@ docker-compose.yml:
 Dockerfile Backend:
     - image: eclipse-temurin:11
 
+- Change URL in axios calls
+- change placeholder email to real email
+
+
 Currently working:
     - api urls to: 192.168.178.69:8886
 - evtl option to create subdomain for this
