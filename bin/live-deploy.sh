@@ -29,7 +29,7 @@ echo "*****************************"
 #echo "***** Import database successful *****"
 
 echo "***** build frontend *****"
-cd /home/michael/Projekte/private/ghp_board/frontend/ && npm run build
+cd /Users/michaelstoelting/Projekte/private/ghp_board/frontend/ && npm run build
 ssh ionos-vps "cd /var/www/html && rm -rf dist_old && mv dist dist_old"
-scp -r /home/michael/Projekte/private/ghp_board/frontend/dist ionos-vps:/var/www/html/
+scp -r /Users/michaelstoelting/Projekte/private/ghp_board/frontend/dist ionos-vps:/var/www/html/
 echo "***** build frontend successful *****"
